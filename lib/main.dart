@@ -28,7 +28,10 @@ class MyApp extends StatelessWidget {
 
 final counterProvider = StateNotifierProvider<CounterNotifier, Counter>((ref) => CounterNotifier());
 
-final fetchCounterFutureProvider = FutureProvider((ref) => Future.delayed(const Duration(seconds: 5), () => 15));
+final fetchCounterFutureProvider = FutureProvider((ref) {
+  final counter = ref.watch(counterProvider.select((value) => value.aCounter));
+  return Future.delayed(const Duration(seconds: 5), () => counter + 100);
+});
 
 class Counter {
   int aCounter;
