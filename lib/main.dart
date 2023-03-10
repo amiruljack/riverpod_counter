@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
 }
 
 final counterProvider = StateNotifierProvider<CounterNotifier, Counter>((ref) => CounterNotifier());
+
+final fetchCounterFutureProvider = FutureProvider((ref) => Future.delayed(const Duration(seconds: 5), () => 15));
 
 class Counter {
   int aCounter;
@@ -65,6 +68,7 @@ class CounterPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     print("rebuilt");
     final counter = ref.watch(counterProvider.select((value) => value.aCounter));
+    final futureProvider = ref.watch(fetchCounterFutureProvider);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -72,6 +76,23 @@ class CounterPage extends ConsumerWidget {
           Text(
             'Counter Value: ${counter.toString()}',
             style: CupertinoTheme.of(context).textTheme.navLargeTitleTextStyle,
+          ),
+          futureProvider.when(
+            data: (data) => Text('Future Value: ${data.toString()}'),
+            error: (error, stack) => Text('Future Value: Error ${error.toString()}'),
+            loading: () => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text('Future Value: '),
+                SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           Row(
